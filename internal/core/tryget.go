@@ -11,7 +11,7 @@ func getNewPost(url string) (item rss.Item, err error) {
 
 	nowTime := time.Now().In(jst)
 	var i int
-	for i = 1; i <= 15; i++ {
+	for i = 1; i <= 360; i++ {
 		fmt.Println(i, "回目...")
 		item, err = rss.GetLatestRssPost(url)
 		if err != nil {
@@ -23,9 +23,9 @@ func getNewPost(url string) (item rss.Item, err error) {
 			break
 		}
 
-		time.Sleep(time.Second * 3)
+		time.Sleep(time.Second * 20)
 	}
-	if i == 16 {
+	if i == 361 {
 		fmt.Println("失敗しました")
 		return rss.Item{}, fmt.Errorf("更新されませんでした")
 	}
