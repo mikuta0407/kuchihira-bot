@@ -1,3 +1,10 @@
+# kuchihira-bot
+
+ja: 「[中村繪里子・吉田尚記の本格雑談くちをひらく](https://omny.fm/shows/kuchiwohiraku?cloudflare-language=ja)」の更新通知を Twitter ([@kuchihira_bot](https://twitter.com/kuchihira_bot), 公黙認) と Bluesky ([@kuchihira-bot.bsky.social](https://bsky.app/profile/kuchihira-bot.bsky.social), 非公式)に投稿するBotプログラム
+
+en: A bot program that posts "[中村繪里子・吉田尚記の本格雑談くちをひらく](https://omny.fm/shows/kuchiwohiraku?cloudflare-language=ja)" update notifications to Twitter ([@kuchihira_bot](https://twitter.com/kuchihira_bot), semi-official) and Bluesky ([@kuchihira-bot.bsky.social](https://bsky.app/profile/kuchihira-bot.bsky.social), unofficial)
+
+
 ## setup
 
 1. git clone or go install
@@ -58,4 +65,11 @@
 ## usage
 ```bash
 ./kuchihira-bot post
+```
+
+## cron example
+Episode updates are usually done between 17:00 (JST) and 17:02 (JST), so start fetching RSS updates every 20 seconds starting at 16:50 (JST).
+
+```
+50 16 * * * ~/projects/kuchihira-bot/kuchihira-bot post
 ```
