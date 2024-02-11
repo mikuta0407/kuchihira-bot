@@ -7,6 +7,7 @@ require (
 	github.com/bluesky-social/indigo v0.0.0-20240208004502-c72ce2340db3
 	github.com/fatih/color v1.16.0
 	github.com/michimani/gotwi v0.14.0
+	github.com/mmcdole/gofeed v1.2.1
 	github.com/spf13/cobra v1.8.0
 )
 
@@ -61,7 +62,6 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.18 // indirect
 	github.com/matttproud/golang_protobuf_extensions/v2 v2.0.0 // indirect
 	github.com/minio/sha256-simd v1.0.1 // indirect
-	github.com/mmcdole/gofeed v1.2.1 // indirect
 	github.com/mmcdole/goxpp v1.1.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
