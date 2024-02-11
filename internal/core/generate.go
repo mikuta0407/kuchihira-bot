@@ -40,7 +40,7 @@ func generateTwitterPostText(item rss.Item, kuchihiraCfg *config.KuchihiraConfig
 	return body, nil
 }
 
-func generateBlueskyPostText(item rss.Item, kuchihiraCfg *config.KuchihiraConfig) (string, error) {
+func generateBlueskyPostText(item rss.Item, kuchihiraCfg *config.KuchihiraConfig, isDebug bool) (string, error) {
 	postVars := PostVars{
 		Title:     item.Title,
 		Hashtag:   kuchihiraCfg.Hashtag,

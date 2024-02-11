@@ -15,7 +15,14 @@ type Discord struct {
 	Content   string `json:"content"`
 }
 
-func DoPost(cfg *config.DiscordConfig, text string) error {
+func DoPost(cfg *config.DiscordConfig, text string, isDebug bool) error {
+
+	if isDebug {
+		fmt.Println("========== Discord ==========")
+		fmt.Println(text)
+		return nil
+	}
+
 	discord := Discord{
 		Username:  cfg.Username,
 		AvatarUrl: cfg.AvatarUrl,

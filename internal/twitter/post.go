@@ -11,7 +11,12 @@ import (
 	"github.com/mikuta0407/kuchihira-bot/internal/config"
 )
 
-func DoPost(cfg *config.TwitterConfig, text string) error {
+func DoPost(cfg *config.TwitterConfig, text string, isDebug bool) error {
+	if isDebug {
+		fmt.Println("========== Twitter ==========")
+		fmt.Println(text)
+		return nil
+	}
 	// Setup credentials
 	os.Setenv("GOTWI_API_KEY", cfg.APIKey)
 	os.Setenv("GOTWI_API_KEY_SECRET", cfg.APIKeySecret)

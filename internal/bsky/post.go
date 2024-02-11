@@ -11,7 +11,14 @@ import (
 	"github.com/mikuta0407/kuchihira-bot/internal/config"
 )
 
-func DoPost(cfg *config.BskyConfig, text string) error {
+func DoPost(cfg *config.BskyConfig, text string, isDebug bool) error {
+
+	if isDebug {
+		fmt.Println("========== Bluesky ==========")
+		fmt.Println(text)
+		return nil
+	}
+
 	xrpcc, err := makeXRPCC(cfg)
 	if err != nil {
 		return fmt.Errorf("cannot create client: %w", err)
@@ -22,7 +29,8 @@ func DoPost(cfg *config.BskyConfig, text string) error {
 		CreatedAt: time.Now().Local().Format(time.RFC3339),
 	}
 
-	for _, entry := range extractLinksBytes(text) {
+	linkentries := extractLinksBytes(text)
+	for i, entry := range linkentries {
 		post.Facets = append(post.Facets, &bsky.RichtextFacet{
 			Features: []*bsky.RichtextFacet_Features_Elem{
 				{
@@ -36,11 +44,19 @@ func DoPost(cfg *config.BskyConfig, text string) error {
 				ByteEnd:   entry.end,
 			},
 		})
+
 		if post.Embed == nil {
 			post.Embed = &bsky.FeedPost_Embed{}
 		}
-		if post.Embed.EmbedExternal == nil {
-			addLink(xrpcc, post, entry.text)
+
+		// 最後のものだけカード化する
+		if len(linkentries)-1 == i {
+			if post.Embed == nil {
+				post.Embed = &bsky.FeedPost_Embed{}
+			}
+			if post.Embed.EmbedExternal == nil {
+				addLink(xrpcc, post, entry.text)
+			}
 		}
 	}
 

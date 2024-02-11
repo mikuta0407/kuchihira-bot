@@ -17,12 +17,15 @@ var postCmd = &cobra.Command{
 	// Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("post called")
-		if err := core.Start(); err != nil {
+		if err := core.Start(debug); err != nil {
 			fmt.Println(err)
 		}
 	},
 }
 
+var debug bool
+
 func init() {
 	rootCmd.AddCommand(postCmd)
+	postCmd.Flags().BoolVar(&debug, "debug", false, "debug(default: false)")
 }

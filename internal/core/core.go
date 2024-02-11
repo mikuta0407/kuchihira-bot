@@ -2,11 +2,12 @@ package core
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/mikuta0407/kuchihira-bot/internal/bsky"
 	"github.com/mikuta0407/kuchihira-bot/internal/config"
 	"github.com/mikuta0407/kuchihira-bot/internal/discord"
-	"github.com/mikuta0407/kuchihira-bot/internal/rss"
+	"github.com/mikuta0407/kuchihira-bot/internal/twitter"
 )
 
 var (
@@ -14,6 +15,8 @@ var (
 	kuchihiraCfg *config.KuchihiraConfig
 	twtrCfg      *config.TwitterConfig
 	bskyCfg      *config.BskyConfig
+
+	jst *time.Location
 )
 
 func init() {
@@ -38,13 +41,19 @@ func init() {
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	jst, _ = time.LoadLocation("Asia/Tokyo")
 }
-func Start() error {
+func Start(isDebug bool) error {
+
+	if isDebug {
+		fmt.Println("==== DRY RUN MODE!!! ====")
+	}
 
 	// RSS取得
-	item, err := rss.GetRss(kuchihiraCfg.RSSURL)
+	item, err := getNewPost(kuchihiraCfg.RSSURL)
 	if err != nil {
-		discord.DoPost(discordCfg, "Failed: Get RSS, "+err.Error())
+		discord.DoPost(discordCfg, "Failed: Get RSS, "+err.Error(), isDebug)
 		return err
 	}
 
@@ -55,24 +64,22 @@ func Start() error {
 		fmt.Println(err)
 		return err
 	}
-	fmt.Println(text)
 	// 投稿
-	// if err := twitter.DoPost(twtrCfg, text); err != nil {
-	// 	discord.DoPost(discordCfg, "Failed: Twitter")
-	// }
+	if err := twitter.DoPost(twtrCfg, text, isDebug); err != nil {
+		discord.DoPost(discordCfg, "Failed: Twitter", isDebug)
+	}
 
 	// Blueskyへの投稿
 	// 本文生成
-	text, err = generateBlueskyPostText(item, kuchihiraCfg)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	return err
-	// }
-	fmt.Println(text)
-	if err := bsky.DoPost(bskyCfg, text); err != nil {
-		discord.DoPost(discordCfg, "Failed: Bluesky")
+	text, err = generateBlueskyPostText(item, kuchihiraCfg, isDebug)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	if err := bsky.DoPost(bskyCfg, text, isDebug); err != nil {
+		discord.DoPost(discordCfg, "Failed: Bluesky", isDebug)
 	}
 
-	discord.DoPost(discordCfg, "Kuchihira-bot Finish")
+	discord.DoPost(discordCfg, "Kuchihira-bot Finish", isDebug)
 	return nil
 }
