@@ -37,15 +37,15 @@ type KuchihiraConfig struct {
 }
 
 func GetConfigDir() (string, error) {
-	nowdir, _ := os.Getwd()
-	return filepath.Join(nowdir, "_config"), nil
+	// nowdir, _ := os.Getwd()
+	// return filepath.Join(nowdir, "_config"), nil
 
-	// exe, err := os.Executable()
-	// if err != nil {
-	// 	return "", err
-	// }
+	exe, err := os.Executable()
+	if err != nil {
+		return "", err
+	}
 
-	// return filepath.Dir(exe), nil
+	return filepath.Join(filepath.Dir(exe), "_config"), nil
 }
 
 func LoadBskyConfig() (*BskyConfig, error) {
