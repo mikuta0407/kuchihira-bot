@@ -73,3 +73,27 @@ Episode updates are usually done between 17:00 (JST) and 17:02 (JST), so start f
 ```
 50 16 * * * ~/projects/kuchihira-bot/kuchihira-bot post
 ```
+
+## Licence
+
+MIT
+
+## Note
+
+- Bluesky posting logic is based on the implementation at https://github.com/mattn/bsky.
+
+
+## Digression(余談)
+- 元々、 https://gist.github.com/mikuta0407/955808cff9eb725a313a17286c43b558 でも公開しているPHP製プログラムとして2023年5月から稼働させていました。Bluesky投稿を勝手に実装してみるにあたり、PHPでBlueskyのリンク付き投稿の実装がかなり辛かったため、既にmattn氏によって作られていたリンク付き投稿のコードを利用するために、Goを用いて最初から作り直してみました。
+
+    正直なところ、行数は増え、cobraによるCLIコマンドを(blueskyログインのためだけに)足したため、プログラムの規模に対して内容が過剰になってしまいました。
+    
+    書き直したメリットとしては、
+    - Goによってシングルバイナリになったこと
+    - すべての変数を外に出したこと(PHPで作ったときは(面倒くさくて)ハードコーディングしていた部分を外に出しながら作った)
+      - 逆に配置時面倒くさくなったとも言える
+    - templatesを使ってパワーな文字列結合をしなくなったこと
+
+    くらいでしょうか。
+
+    このプログラムは利用者が作者自身しかいない気がしますが、一応制作物としてここに置いておきいます。くちをひらかーの皆様、もしツッコミどころや鉞組があればお待ちしています。
