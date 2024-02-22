@@ -1,24 +1,38 @@
 package core
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/mikuta0407/kuchihira-bot/internal/rss"
+	"github.com/mmcdole/gofeed"
 )
 
-func getNewPost(url string) (item rss.Item, err error) {
+type Item struct {
+	Title string
+	URL   string
+}
 
-	nowTime := time.Now().In(jst)
+func getNewPost(url string) (items []Item, latestGUID string, err error) {
+
+	lastGUID, err := loadLastGUID()
+	if err != nil {
+		return
+	}
+	var feedItems []*gofeed.Item
+
 	var i int
 	for i = 1; i <= 360; i++ {
 		fmt.Println(i, "回目...")
-		item, err = rss.GetLatestRssPost(url)
+		feedItems, err = rss.GetAllRssFeed(url)
 		if err != nil {
-			return rss.Item{}, err
+			return
 		}
 
-		if truncateTime(item.PubDate).Equal(truncateTime(nowTime)) {
+		if isExistNewPost(feedItems[0], lastGUID) {
 			fmt.Println("取得!")
 			break
 		}
@@ -27,14 +41,98 @@ func getNewPost(url string) (item rss.Item, err error) {
 	}
 	if i == 361 {
 		fmt.Println("失敗しました")
-		return rss.Item{}, fmt.Errorf("更新されませんでした")
+		return items, "", fmt.Errorf("更新されませんでした")
+	}
+
+	items, latestGUID = extractNewPosts(feedItems, lastGUID)
+	return
+}
+
+func isExistNewPost(item *gofeed.Item, lastGUID string) bool {
+	return item.GUID != lastGUID
+}
+
+func extractNewPosts(feeditems []*gofeed.Item, lastGUID string) (newItems []Item, latestGUID string) {
+	latestGUID = feeditems[0].GUID
+
+	for _, v := range feeditems {
+		if v.GUID == lastGUID {
+			return
+		}
+
+		tmpItems := []Item{
+			{
+				Title: v.Title,
+				URL:   v.Link,
+			},
+		}
+
+		newItems = append(tmpItems, newItems...)
+		if lastGUID == "" {
+			return
+		}
 	}
 
 	return
-
 }
 
-func truncateTime(t time.Time) time.Time {
-	t = t.Truncate(time.Hour).Add(-time.Duration(t.Hour()) * time.Hour)
-	return t
+func getDataDir() (string, error) {
+	nowdir, err := os.Getwd()
+	return filepath.Join(nowdir, "_data"), err
+
+	// exe, err := os.Executable()
+	// if err != nil {
+	// 	return "", err
+	// }
+
+	// return filepath.Join(filepath.Dir(exe), "_config"), nil
+}
+
+func loadLastGUID() (string, error) {
+	dir, err := getDataDir()
+	if err != nil {
+		return "", err
+	}
+
+	path := filepath.Join(dir, "last-guid.json")
+	_, err = os.Stat(path)
+	if err != nil {
+		// なかったので空で返す
+		return "", nil
+	}
+
+	b, err := os.ReadFile(path)
+	if err != nil {
+		return "", fmt.Errorf("cannot load last guid: %w", err)
+	}
+	var guidJSON GUIDJSON
+	err = json.Unmarshal(b, &guidJSON)
+	if err != nil {
+		return "", fmt.Errorf("cannot load last guid: %w", err)
+	}
+
+	return guidJSON.GUID, nil
+}
+
+func saveLastGUID(guid string) error {
+	dir, err := getDataDir()
+	if err != nil {
+		return err
+	}
+	var guidJSON GUIDJSON
+	guidJSON.GUID = guid
+
+	b, err := json.Marshal(&guidJSON)
+	if err != nil {
+		return fmt.Errorf("cannot make guid json: %w", err)
+	}
+	err = os.WriteFile(filepath.Join(dir, "last-guid.json"), b, 0644)
+	if err != nil {
+		return fmt.Errorf("cannot write guid file: %w", err)
+	}
+	return nil
+}
+
+type GUIDJSON struct {
+	GUID string `json:"guid"`
 }

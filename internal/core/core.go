@@ -15,8 +15,6 @@ var (
 	kuchihiraCfg *config.KuchihiraConfig
 	twtrCfg      *config.TwitterConfig
 	bskyCfg      *config.BskyConfig
-
-	jst *time.Location
 )
 
 func init() {
@@ -42,7 +40,6 @@ func init() {
 		fmt.Println(err)
 	}
 
-	jst, _ = time.LoadLocation("Asia/Tokyo")
 }
 func Start(isDebug bool) error {
 
@@ -51,12 +48,33 @@ func Start(isDebug bool) error {
 	}
 
 	// RSS取得
-	item, err := getNewPost(kuchihiraCfg.RSSURL)
+	items, latestGUID, err := getNewPost(kuchihiraCfg.RSSURL)
 	if err != nil {
 		discord.DoPost(discordCfg, "Failed: Get RSS, "+err.Error(), isDebug)
 		return err
 	}
 
+	if len(items) != 1 {
+		discord.DoPost(discordCfg, "Warning: Multi publish detected", isDebug)
+	}
+
+	if err := saveLastGUID(latestGUID); err != nil {
+		discord.DoPost(discordCfg, "Failed: saveLastGUID: "+latestGUID, isDebug)
+	}
+
+	for _, v := range items {
+		if err := post(v, isDebug); err != nil {
+			return err
+		}
+		if len(items) != 1 {
+			time.Sleep(time.Second * 2)
+		}
+	}
+
+	return nil
+}
+
+func post(item Item, isDebug bool) error {
 	// Twitterへの投稿
 	// 本文生成
 	text, err := generateTwitterPostText(item, kuchihiraCfg)
@@ -81,5 +99,7 @@ func Start(isDebug bool) error {
 	}
 
 	discord.DoPost(discordCfg, "Kuchihira-bot Finish", isDebug)
+
 	return nil
+
 }
