@@ -77,15 +77,15 @@ func extractNewPosts(feeditems []*gofeed.Item, lastGUID string) (newItems []Item
 }
 
 func getDataDir() (string, error) {
-	nowdir, err := os.Getwd()
-	return filepath.Join(nowdir, "_data"), err
+	// nowdir, err := os.Getwd()
+	// return filepath.Join(nowdir, "_data"), err
 
-	// exe, err := os.Executable()
-	// if err != nil {
-	// 	return "", err
-	// }
+	exe, err := os.Executable()
+	if err != nil {
+		return "", err
+	}
 
-	// return filepath.Join(filepath.Dir(exe), "_config"), nil
+	return filepath.Join(filepath.Dir(exe), "_data"), nil
 }
 
 func loadLastGUID() (string, error) {
@@ -117,6 +117,7 @@ func loadLastGUID() (string, error) {
 func saveLastGUID(guid string) error {
 	dir, err := getDataDir()
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 	var guidJSON GUIDJSON
