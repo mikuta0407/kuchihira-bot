@@ -32,3 +32,14 @@ func GetLatestRssPost(url string) (Item, error) {
 		PubDate: latestItem.PublishedParsed.In(jst),
 	}, nil
 }
+
+func GetAllRssFeed(url string) (items []*gofeed.Item, err error) {
+	fp := gofeed.NewParser()
+	feed, err := fp.ParseURL(url)
+	if err != nil {
+		return []*gofeed.Item{}, err
+	}
+
+	items = append(items, feed.Items...)
+	return
+}

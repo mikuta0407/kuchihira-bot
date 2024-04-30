@@ -7,7 +7,6 @@ import (
 	"text/template"
 
 	"github.com/mikuta0407/kuchihira-bot/internal/config"
-	"github.com/mikuta0407/kuchihira-bot/internal/rss"
 )
 
 //go:embed templates
@@ -22,7 +21,7 @@ type PostVars struct {
 	ItemURL   string
 }
 
-func generateTwitterPostText(item rss.Item, kuchihiraCfg *config.KuchihiraConfig) (string, error) {
+func generateTwitterPostText(item Item, kuchihiraCfg *config.KuchihiraConfig) (string, error) {
 	postVars := PostVars{
 		Title:     item.Title,
 		Hashtag:   kuchihiraCfg.Hashtag,
@@ -40,7 +39,7 @@ func generateTwitterPostText(item rss.Item, kuchihiraCfg *config.KuchihiraConfig
 	return body, nil
 }
 
-func generateBlueskyPostText(item rss.Item, kuchihiraCfg *config.KuchihiraConfig, isDebug bool) (string, error) {
+func generateBlueskyPostText(item Item, kuchihiraCfg *config.KuchihiraConfig, isDebug bool) (string, error) {
 	postVars := PostVars{
 		Title:     item.Title,
 		Hashtag:   kuchihiraCfg.Hashtag,

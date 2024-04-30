@@ -54,11 +54,11 @@ func LoadBskyConfig() (*BskyConfig, error) {
 		return nil, err
 	}
 
-	fp := filepath.Join(dir, "config-bsky.json")
+	path := filepath.Join(dir, "config-bsky.json")
 
-	os.MkdirAll(filepath.Dir(fp), 0700)
+	os.MkdirAll(filepath.Dir(path), 0700)
 
-	b, err := os.ReadFile(fp)
+	b, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("cannot load config file: %w", err)
 	}
@@ -80,11 +80,11 @@ func LoadTwitterConfig() (*TwitterConfig, error) {
 		return nil, err
 	}
 
-	fp := filepath.Join(dir, "config-twtr.json")
+	path := filepath.Join(dir, "config-twtr.json")
 
-	os.MkdirAll(filepath.Dir(fp), 0700)
+	os.MkdirAll(filepath.Dir(path), 0700)
 
-	b, err := os.ReadFile(fp)
+	b, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("cannot load config file: %w", err)
 	}
@@ -103,11 +103,11 @@ func LoadDiscordConfig() (*DiscordConfig, error) {
 		return nil, err
 	}
 
-	fp := filepath.Join(dir, "config-discord.json")
+	path := filepath.Join(dir, "config-discord.json")
 
-	os.MkdirAll(filepath.Dir(fp), 0700)
+	os.MkdirAll(filepath.Dir(path), 0700)
 
-	b, err := os.ReadFile(fp)
+	b, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("cannot load config file: %w", err)
 	}
@@ -126,11 +126,11 @@ func LoadKuchihiraConfig() (*KuchihiraConfig, error) {
 		return nil, err
 	}
 
-	fp := filepath.Join(dir, "config-kuchihira.json")
+	path := filepath.Join(dir, "config-kuchihira.json")
 
-	os.MkdirAll(filepath.Dir(fp), 0700)
+	os.MkdirAll(filepath.Dir(path), 0700)
 
-	b, err := os.ReadFile(fp)
+	b, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("cannot load config file: %w", err)
 	}
