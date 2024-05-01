@@ -17,7 +17,7 @@ var postCmd = &cobra.Command{
 	// Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("post called")
-		if err := core.Start(debug); err != nil {
+		if err := core.SingleStart(debug); err != nil {
 			fmt.Println(err)
 		}
 	},
