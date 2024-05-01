@@ -1,5 +1,11 @@
 build:
-	go build .
+	go build -o kuchihira-bot
 
-debug: build
-	./kuchihira-bot post --debug
+build-debug:
+	go build -o kuchihira-bot_debug
+
+debug: build-debug
+	./kuchihira-bot_debug post --debug
+
+daemondebug: build
+	./kuchihira-bot_debug daemon --debug
