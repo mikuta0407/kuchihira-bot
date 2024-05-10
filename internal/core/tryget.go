@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/mikuta0407/kuchihira-bot/internal/rss"
 	"github.com/mmcdole/gofeed"
@@ -24,24 +23,13 @@ func getNewPost(url string) (items []Item, latestGUID string, err error) {
 	}
 	var feedItems []*gofeed.Item
 
-	var i int
-	for i = 1; i <= 360; i++ {
-		fmt.Println(i, "回目...")
-		feedItems, err = rss.GetAllRssFeed(url)
-		if err != nil {
-			return
-		}
-
-		if isExistNewPost(feedItems[0], lastGUID) {
-			fmt.Println("取得!")
-			break
-		}
-
-		time.Sleep(time.Second * 20)
+	feedItems, err = rss.GetAllRssFeed(url)
+	if err != nil {
+		return
 	}
-	if i == 361 {
-		fmt.Println("失敗しました")
-		return items, "", fmt.Errorf("更新されませんでした")
+
+	if !isExistNewPost(feedItems[0], lastGUID) {
+		return items, "", ErrorNoUpdate
 	}
 
 	items, latestGUID = extractNewPosts(feedItems, lastGUID)
