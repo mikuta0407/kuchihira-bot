@@ -7,5 +7,5 @@ build-debug:
 debug: build-debug
 	./kuchihira-bot_debug post --debug
 
-daemondebug: build
+daemondebug: build-debug
 	./kuchihira-bot_debug daemon --debug
