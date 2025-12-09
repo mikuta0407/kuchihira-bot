@@ -1,8 +1,8 @@
 # kuchihira-bot
 
-ja: 「[中村繪里子・吉田尚記の本格雑談くちをひらく](https://omny.fm/shows/kuchiwohiraku?cloudflare-language=ja)」の更新通知を Twitter ([@kuchihira_bot](https://twitter.com/kuchihira_bot), 公黙認) と Bluesky ([@kuchihira-bot.bsky.social](https://bsky.app/profile/kuchihira-bot.bsky.social), 非公式)に投稿するBotプログラム
+ja: 「[中村繪里子・吉田尚記の本格雑談くちをひらく](https://omny.fm/shows/kuchiwohiraku?cloudflare-language=ja)」の更新通知を Twitter ([@kuchihira_bot](https://twitter.com/kuchihira_bot), 公黙認) と Bluesky ([@kuchihira-bot.bsky.social](https://bsky.app/profile/kuchihira-bot.bsky.social), 非公式)に投稿するBotプログラム。このボットは RSS の更新内容を Twitter に投稿できます。基本的な RSS フィード形式であれば他のポッドキャストにも利用可能です。
 
-en: A bot program that posts "[中村繪里子・吉田尚記の本格雑談くちをひらく](https://omny.fm/shows/kuchiwohiraku?cloudflare-language=ja)" update notifications to Twitter ([@kuchihira_bot](https://twitter.com/kuchihira_bot), semi-official) and Bluesky ([@kuchihira-bot.bsky.social](https://bsky.app/profile/kuchihira-bot.bsky.social), unofficial)
+en: A bot program that posts "[中村繪里子・吉田尚記の本格雑談くちをひらく](https://omny.fm/shows/kuchiwohiraku?cloudflare-language=ja)" update notifications to Twitter ([@kuchihira_bot](https://twitter.com/kuchihira_bot), semi-official) and Bluesky ([@kuchihira-bot.bsky.social](https://bsky.app/profile/kuchihira-bot.bsky.social), unofficial) This bot can post RSS updates to Twitter. It works with standard RSS feeds and can be used for other podcasts as well.
 
 
 ## setup
@@ -37,12 +37,12 @@ en: A bot program that posts "[中村繪里子・吉田尚記の本格雑談く�
     ```json
     {
         "apikey":"hogeApiKey",
-        "apikeysec":"hogeApiKeySecet",
+        "apikeysec":"hogeApiKeySecret",
         "oauthtoken":"hogeOAuthToken",
         "oauthtokensec":"hogeOAuthTokenSecret"
     }
     ```
-5. create `_config/kuchihira/json`
+5. create `_config/config-kuchihira.json`
     ```json
     {
         "hashtag":"#くちをひらく",
@@ -96,11 +96,11 @@ Episode updates are usually done between 17:00 (JST) and 17:02 (JST), so start f
 Description=Kuchiwohiraku Bot
 
 [Service]
-ExecStart = /path/to/kuchihira-bot/kuchihira-bot daemon
-Restart = always
-Type = simple
-User = hogeuser
-Group = hogeuser
+ExecStart=/path/to/kuchihira-bot/kuchihira-bot daemon
+Restart=always
+Type=simple
+User=hogeuser
+Group=hogeuser
 
 [Install]
 WantedBy=multi-user.target
@@ -118,9 +118,9 @@ make debug
 ```
 デーモンモードの場合は
 ```
-make damondebug
+make daemondebug
 ```
-を使用するなど、makeコマンドを使用してください。この2つのmakeコマンドは、カレントディレクトリに`kuchihira-bot_debug`としてバイナリファイルを出力g、`--debug`オプションを付加させた状態で起動します。
+を使用するなど、makeコマンドを使用してください。この2つのmakeコマンドは、カレントディレクトリに`kuchihira-bot_debug`としてバイナリファイルを出力し、`--debug`オプションを付加させた状態で起動します。
 (`internal/config/config.go`内の`GetConfigDir()`でコメントアウトを入れ替えれば、シェルのカレントディレクトリを見に行くようにはなりますが、おすすめはしません。)
 
 en:
@@ -128,18 +128,18 @@ en:
 Do not run with `go run` as it retrieves configuration files and data relative to the binary location. If you start it with `go run`, it will try to read `_config` under /tmp and will not work.
 Please use the following make command when testing the operation.
 For one-shot execution
-````
+```
 make debug
-````
+```
 In daemon mode
-````
+```
 make daemondebug
-````
+```
 
 These two make commands output a binary file as `kuchihira-bot_debug` in the current directory and start with the `--debug` option added.
 (If you replace the comment out with `GetConfigDir()` in `internal/config/config.go`, you will be able to see the current directory of the shell, but I do not recommend it.)
 
-## Licence
+## License
 
 MIT
 
@@ -161,4 +161,4 @@ MIT
 
     くらいでしょうか。
 
-    このプログラムは利用者が作者自身しかいない気がしますが、一応制作物としてここに置いておきいます。くちをひらかーの皆様、もしツッコミどころや鉞組があればお待ちしています。
+    このプログラムは利用者が作者自身しかいない気がしますが、一応制作物としてここに置いておきます。くちをひらかーの皆様、もしツッコミどころや鉞組があればお待ちしています。

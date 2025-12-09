@@ -45,6 +45,4 @@ func DaemonStart(isDebug bool) error {
 		time.Sleep(time.Second * 20)
 
 	}
-
-	return nil
 }
