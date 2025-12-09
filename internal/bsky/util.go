@@ -28,7 +28,12 @@ func printPost(p *bsky.FeedDefs_PostView) {
 	fmt.Print(p.Author.Handle)
 	color.Set(color.Reset)
 	fmt.Printf(" [%s]", stringp(p.Author.DisplayName))
-	fmt.Printf(" (%s)\n", timep(rec.CreatedAt).Format(time.RFC3339))
+	t, err := timep(rec.CreatedAt)
+	if err != nil {
+		fmt.Printf(" (%s)\n", rec.CreatedAt)
+	} else {
+		fmt.Printf(" (%s)\n", t.Format(time.RFC3339))
+	}
 	if rec.Entities != nil {
 		sort.Slice(rec.Entities, func(i, j int) bool {
 			return rec.Entities[i].Index.Start < rec.Entities[j].Index.Start
@@ -93,14 +98,14 @@ var formats = []string{
 	"2006-01-02T15:04:05-07:00",
 }
 
-func timep(s string) time.Time {
+func timep(s string) (time.Time, error) {
 	for _, f := range formats {
 		t, err := time.Parse(f, s)
 		if err == nil {
-			return t.Local()
+			return t.Local(), nil
 		}
 	}
-	panic(s)
+	return time.Time{}, fmt.Errorf("cannot parse time: %s", s)
 }
 
 func int64p(i *int64) int64 {
@@ -169,12 +174,23 @@ func makeXRPCC(cfg *config.BskyConfig) (*xrpc.Client, error) {
 }
 
 func addLink(xrpcc *xrpc.Client, post *bsky.FeedPost, link string) {
-	doc, err := goquery.NewDocument(link)
 	var title string
 	var description string
 	var imgURL string
 
+	client := &http.Client{Timeout: 10 * time.Second}
+	httpResp, err := client.Get(link)
+	var doc *goquery.Document
 	if err == nil {
+		defer httpResp.Body.Close()
+		if httpResp.StatusCode >= 200 && httpResp.StatusCode < 300 {
+			doc, err = goquery.NewDocumentFromReader(httpResp.Body)
+		} else {
+			err = fmt.Errorf("http status: %d", httpResp.StatusCode)
+		}
+	}
+
+	if err == nil && doc != nil {
 		title = doc.Find(`title`).Text()
 		description, _ = doc.Find(`meta[property="description"]`).Attr("content")
 		imgURL, _ = doc.Find(`meta[property="og:image"]`).Attr("content")
@@ -204,18 +220,21 @@ func addLink(xrpcc *xrpc.Client, post *bsky.FeedPost, link string) {
 			},
 		}
 	}
+
 	if imgURL != "" && post.Embed.EmbedExternal != nil {
-		resp, err := http.Get(imgURL)
+		imgResp, err := client.Get(imgURL)
 		if err == nil {
-			defer resp.Body.Close()
-			b, err := io.ReadAll(resp.Body)
-			if err == nil {
-				resp, err := comatproto.RepoUploadBlob(context.TODO(), xrpcc, bytes.NewReader(b))
+			defer imgResp.Body.Close()
+			if imgResp.StatusCode >= 200 && imgResp.StatusCode < 300 {
+				b, err := io.ReadAll(imgResp.Body)
 				if err == nil {
-					post.Embed.EmbedExternal.External.Thumb = &lexutil.LexBlob{
-						Ref:      resp.Blob.Ref,
-						MimeType: http.DetectContentType(b),
-						Size:     resp.Blob.Size,
+					blobResp, err := comatproto.RepoUploadBlob(context.TODO(), xrpcc, bytes.NewReader(b))
+					if err == nil {
+						post.Embed.EmbedExternal.External.Thumb = &lexutil.LexBlob{
+							Ref:      blobResp.Blob.Ref,
+							MimeType: http.DetectContentType(b),
+							Size:     blobResp.Blob.Size,
+						}
 					}
 				}
 			}
