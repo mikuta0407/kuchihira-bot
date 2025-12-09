@@ -31,11 +31,12 @@ func SingleStart(isDebug bool) error {
 			break
 		}
 		time.Sleep(time.Second * 20)
-		if i == 361 {
-			fmt.Println(ErrorNoUpdate)
-			discord.DoPost(discordCfg, "Failed: Get RSS, "+ErrorNoUpdate.Error(), isDebug)
-			return ErrorNoUpdate
-		}
+	}
+
+	if latestGUID == "" {
+		fmt.Println(ErrorNoUpdate)
+		discord.DoPost(discordCfg, "Failed: Get RSS, "+ErrorNoUpdate.Error(), isDebug)
+		return ErrorNoUpdate
 	}
 
 	if err != nil {
